@@ -1,15 +1,23 @@
 const playerBodies = {};
 
-const Bodies = Matter.Bodies,
-      Body = Matter.Body,
-      Composite = Matter.Composite,
-      Constraint = Matter.Constraint,
-      Engine = Matter.Engine,
-      Mouse = Matter.Mouse,
-      MouseConstraint = Matter.MouseConstraint,
-      Render = Matter.Render,
-      Runner = Matter.Runner,
-      World = Matter.World;
+const {
+  Bodies,
+  Body,
+  Composite,
+  Constraint,
+  Engine,
+  Events,
+  Mouse,
+  MouseConstraint,
+  Render,
+  Runner,
+  Query,
+  World,
+} = Matter;
+
+// Create engine
+var engine = Engine.create(),
+world = engine.world;
 
 MouseConstraint.update = function(mouseConstraint, bodies) {
   try {
@@ -32,13 +40,9 @@ MouseConstraint.update = function(mouseConstraint, bodies) {
       constraint.angleB = playerBody.angle;
     }
   } catch (err) {
-    console.log('Unable to follow mouse (player might be gone)');
+    // TODO: figure out how to delete orphaned mouse constraints
   }
 }
-
-// Create engine
-var engine = Engine.create(),
-world = engine.world;
 
 // Create renderer
 var render = Render.create({
@@ -216,6 +220,27 @@ Render.lookAt(render, {
 const runner = Runner.create();
 Runner.run(runner, engine);
 
+// Collisions
+setInterval(() => {
+  try {
+    const myBody = playerBodies[socket.id].bodies[0];
+    const otherBodies = [];
+    for (const [key, value] of Object.entries(playerBodies)) {
+      if (key == socket.id) continue;
+      otherBodies.push(value.bodies[0]);
+    }
+
+    if (!otherBodies.length) return;
+
+    if (Matter.Query.collides(myBody, otherBodies).length > 0) {
+      console.log('High Five!')
+    }
+
+  } catch (err) {
+    console.log(err)
+  }
+}, 500);
+
 // Handle connects and disconnects
 setInterval(() => {
   for (const [key, value] of Object.entries(localGameState.players)) {
@@ -227,7 +252,7 @@ setInterval(() => {
   for (const [key, value] of Object.entries(playerBodies)) {
     if (!localGameState.players[key]) {
       console.log('deleting player');
-      Matter.Composite.remove(world, playerBodies[key])
+      Composite.remove(world, playerBodies[key]);
       delete playerBodies[key];
     }
   }
