@@ -11,26 +11,26 @@ const Bodies = Matter.Bodies,
       Runner = Matter.Runner,
       World = Matter.World;
 
-// MouseConstraint.update = function(mouseConstraint, bodies) {
-//   const { constraint, mouse } = mouseConstraint;
-//   const playerBody = playerBodies[mouseConstraint.socketID].bodies[0];
+MouseConstraint.update = function(mouseConstraint, bodies) {
+  const { constraint, mouse } = mouseConstraint;
+  const playerBody = playerBodies[mouseConstraint.socketID].bodies[0];
 
-//   if (mouseConstraint.isRemote) {
-//     try {
-//       const { x = 0, y = 0} = localGameState.players[mouseConstraint.socketID];
-//       constraint.pointA = { x, y };
-//       constraint.bodyB = mouseConstraint.body = playerBody;
-//       constraint.angleB = playerBody.angle;
-//     } catch (err) {
-//       console.log('oh no')
-//     }
+  if (mouseConstraint.isRemote) {
+    try {
+      const { x = 0, y = 0} = localGameState.players[mouseConstraint.socketID];
+      constraint.pointA = { x, y };
+      constraint.bodyB = mouseConstraint.body = playerBody;
+      constraint.angleB = playerBody.angle;
+    } catch (err) {
+      console.log('oh no')
+    }
 
-//   } else {
-//     constraint.pointA = mouse.position;
-//     constraint.bodyB = mouseConstraint.body = playerBody;
-//     constraint.angleB = playerBody.angle;
-//   }
-// }
+  } else {
+    constraint.pointA = mouse.position;
+    constraint.bodyB = mouseConstraint.body = playerBody;
+    constraint.angleB = playerBody.angle;
+  }
+}
 
 // Create engine
 var engine = Engine.create(),
@@ -189,8 +189,8 @@ function newPlayer(socketID) {
     }
   });
 
-  // mouseConstraint.socketID = socketID;
-  // mouseConstraint.isRemote = (socket.id !== socketID);
+  mouseConstraint.socketID = socketID;
+  mouseConstraint.isRemote = (socket.id !== socketID);
   if (!mouseConstraint.isRemote) render.mouse = mouse;
 
   var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
@@ -215,21 +215,19 @@ const runner = Runner.create();
 Runner.run(runner, engine);
 
 // Handle connects and disconnects
-// setInterval(() => {
-//   for (const [key, value] of Object.entries(localGameState.players)) {
-//     if (!playerBodies[key]) {
-//       playerBodies[key] = newPlayer(key);
-//     }
-//   }
+setInterval(() => {
+  for (const [key, value] of Object.entries(localGameState.players)) {
+    if (!playerBodies[key]) {
+      playerBodies[key] = newPlayer(key);
+    }
+  }
   
-//   for (const [key, value] of Object.entries(playerBodies)) {
-//     if (!localGameState.players[key]) {
-//       console.log('deleting player');
-//       Matter.Composite.remove(world, playerBodies[key])
-//       delete playerBodies[key];
-//     }
-//   }
+  for (const [key, value] of Object.entries(playerBodies)) {
+    if (!localGameState.players[key]) {
+      console.log('deleting player');
+      Matter.Composite.remove(world, playerBodies[key])
+      delete playerBodies[key];
+    }
+  }
 
-// }, 500);
-
-newPlayer('123')
+}, 500);
