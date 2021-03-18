@@ -1,3 +1,11 @@
+let pseudoMouseX = 0;
+let pseudoMouseY = 0;
+
+setInterval(() => {
+  pseudoMouseX += 1;
+  pseudoMouseY += 1;
+}, 10);
+
 var Engine = Matter.Engine,
 Render = Matter.Render,
 Runner = Matter.Runner,
@@ -6,6 +14,7 @@ MouseConstraint = Matter.MouseConstraint,
 Mouse = Matter.Mouse,
 World = Matter.World,
 Composite = Matter.Composite,
+IMousePoint = Matter.IMousePoint,
 Bodies = Matter.Bodies;
 
 // create engine
@@ -86,12 +95,21 @@ Render.lookAt(render, {
   max: { x: 800, y: 600 }
 });
 
+// MouseConstraint.update = function(mouseConstraint, bodies) {
+//   var mouse = mouseConstraint.mouse;
+//   var constraint = mouseConstraint.constraint
+//   var body = hand;
+
+//   constraint.pointA =  mouse.position;
+//   constraint.bodyB = mouseConstraint.body = body;
+//   constraint.angleB = body.angle;
+// }
+
 MouseConstraint.update = function(mouseConstraint, bodies) {
-  var mouse = mouseConstraint.mouse;
   var constraint = mouseConstraint.constraint
   var body = hand;
 
-  constraint.pointA =  mouse.position;
+  constraint.pointA = { x: pseudoMouseX, y: pseudoMouseY };
   constraint.bodyB = mouseConstraint.body = body;
   constraint.angleB = body.angle;
 }
