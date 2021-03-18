@@ -1,11 +1,15 @@
 const FPS = 30;
 const socket = io();
+let startEmitting = false;
 let lastMovement = [0, 0];
 
-setInterval(() => {
-  const [x, y] = lastMovement;
-  socket.emit('playerMovement', { x, y });
-}, 1000 / FPS);
+// setInterval(() => {
+//   if (!startEmitting) return;
+//   const [x, y] = lastMovement;
+//   socket.emit('playerMovement', { x, y });
+// }, 1000 / FPS);
+
+setTimeout(() => startEmitting = true, 2000);
 
 // const drawPlayer = (player) => {
 //   ctx.beginPath();
