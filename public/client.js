@@ -1,7 +1,7 @@
 const socket = io();
 let startEmitting = false;
 let localGameState = {};
-let lastPosition = { x: 75, y: 75 };
+let lastPosition = { x: 200, y: 200 };
 
 const handleMouseMove = (event) => {
   let eventDoc, doc, body;

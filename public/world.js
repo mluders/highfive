@@ -12,23 +12,27 @@ const Bodies = Matter.Bodies,
       World = Matter.World;
 
 MouseConstraint.update = function(mouseConstraint, bodies) {
-  const { constraint, mouse } = mouseConstraint;
-  const playerBody = playerBodies[mouseConstraint.socketID].bodies[0];
+  try {
+    const { constraint, mouse } = mouseConstraint;
+    const playerBody = playerBodies[mouseConstraint.socketID].bodies[0];
 
-  if (mouseConstraint.isRemote) {
-    try {
-      const { x = 0, y = 0} = localGameState.players[mouseConstraint.socketID];
-      constraint.pointA = { x, y };
+    if (mouseConstraint.isRemote) {
+        const { x = 0, y = 0} = localGameState.players[mouseConstraint.socketID];
+        constraint.pointA = { x, y };
+        constraint.bodyB = mouseConstraint.body = playerBody;
+        constraint.angleB = playerBody.angle;
+    } else {
+      if (mouse.position.x == 0 && mouse.position.y == 0) {
+        constraint.pointA = { x: 200, y: 200 };
+      } else {
+        constraint.pointA = mouse.position;
+      }
+
       constraint.bodyB = mouseConstraint.body = playerBody;
       constraint.angleB = playerBody.angle;
-    } catch (err) {
-      console.log('oh no')
     }
-
-  } else {
-    constraint.pointA = mouse.position;
-    constraint.bodyB = mouseConstraint.body = playerBody;
-    constraint.angleB = playerBody.angle;
+  } catch (err) {
+    console.log('Unable to follow mouse (player might be gone)');
   }
 }
 
@@ -193,10 +197,8 @@ function newPlayer(socketID) {
   mouseConstraint.isRemote = (socket.id !== socketID);
   if (!mouseConstraint.isRemote) render.mouse = mouse;
 
-  var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
   World.add(world, [
-    playerBody,
-    ground
+    playerBody
   ]);
 
   World.add(world, mouseConstraint);
