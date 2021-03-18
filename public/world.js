@@ -1,6 +1,7 @@
 const playerBodies = {};
 
 const Bodies = Matter.Bodies,
+      Body = Matter.Body,
       Composite = Matter.Composite,
       Constraint = Matter.Constraint,
       Engine = Matter.Engine,
@@ -47,36 +48,176 @@ var render = Render.create({
 });
 
 function newPlayer(socketID) {
-  const hand = Bodies.rectangle(600, 460, 80, 80);
-  const finger = Bodies.rectangle(600, 400, 50, 25);
+  const x = 100;
+  const y = 100;
+  const defaultCollisionGroup = -1;
 
-  const fingerToHand = Constraint.create({
-    bodyA: hand,
+  const chestOptions = {
+    friction: 1,
+    frictionAir: 0.05,
+    collisionFilter: {
+      group: defaultCollisionGroup,
+    },
+    chamfer: {
+      radius: 20,
+    },
+    label: "chest",
+    render: {
+      fillStyle: "#E0A423",
+    },
+  };
+  const legOptions = {
+    friction: 1,
+    frictionAir: 0.03,
+    collisionFilter: {
+      group: defaultCollisionGroup,
+    },
+    chamfer: {
+      radius: 10,
+    },
+    render: {
+      fillStyle: "#FFBC42",
+    },
+  };
+
+  const lowerLegOptions = {
+    friction: 1,
+    frictionAir: 0.03,
+    collisionFilter: {
+      group: defaultCollisionGroup,
+    },
+    chamfer: {
+      radius: 2,
+    },
+    render: {
+      fillStyle: "#E59B12",
+    },
+  };
+
+  chest = Bodies.rectangle(x, y, 120, 80, chestOptions);
+  chest.size = 40; // To determine overlap of goal
+
+  const thumbUpperLeg = Bodies.rectangle(x - 80, y - 20, 20, 40, Object.assign({}, legOptions));
+  const thumbLowerLeg = Bodies.rectangle(x - 80, y - 60, 20, 40, Object.assign({}, lowerLegOptions));
+
+  const pointerUpperLeg = Bodies.rectangle(x - 60, y - 60, 20, 40, Object.assign({}, legOptions));
+  const pointerLowerLeg = Bodies.rectangle(x - 60, y - 100, 20, 60, Object.assign({}, lowerLegOptions));
+
+  const leftUpperLeg = Bodies.rectangle(x - 20, y - 60, 20, 40, Object.assign({}, legOptions));
+  const leftLowerLeg = Bodies.rectangle(x - 20, y - 100, 20, 60, Object.assign({}, lowerLegOptions));
+
+  const rightUpperLeg = Bodies.rectangle(x + 20, y - 60, 20, 40, Object.assign({}, legOptions));
+  const rightLowerLeg = Bodies.rectangle(x + 20, y - 100, 20, 60, Object.assign({}, lowerLegOptions));
+
+  const pinkyUpperLeg = Bodies.rectangle(x + 60, y - 60, 20, 40, Object.assign({}, legOptions));
+  const pinkyLowerLeg = Bodies.rectangle(x + 60, y - 100, 20, 60, Object.assign({}, lowerLegOptions));
+
+  const legTorso = Body.create({
+    parts: [chest, thumbUpperLeg, pointerUpperLeg, leftUpperLeg, rightUpperLeg, pinkyUpperLeg],
+    collisionFilter: {
+      group: defaultCollisionGroup - 1,
+    },
+  });
+
+  /*****************************
+   * Define Constraints/Joints *
+   *****************************/
+
+   const upperToLowerThumbLeg = Constraint.create({
+    bodyA: legTorso,
+    bodyB: thumbLowerLeg,
     pointA: {
-      x: 0,
-      y: 0
+      x: -80,
+      y: -20,
     },
     pointB: {
       x: 0,
-      y: 0
+      y: 25,
     },
-    bodyB: finger,
     stiffness: 1,
     render: {
-      visible: false
-    }
+      visible: false,
+    },
+  });
+
+   const upperToLowerPointerLeg = Constraint.create({
+    bodyA: legTorso,
+    bodyB: pointerLowerLeg,
+    pointA: {
+      x: -60,
+      y: -60,
+    },
+    pointB: {
+      x: 0,
+      y: 25,
+    },
+    stiffness: 1,
+    render: {
+      visible: false,
+    },
+  });
+
+  const upperToLowerLeftLeg = Constraint.create({
+    bodyA: legTorso,
+    bodyB: leftLowerLeg,
+    pointA: {
+      x: -20,
+      y: -60,
+    },
+    pointB: {
+      x: 0,
+      y: 25,
+    },
+    stiffness: 1,
+    render: {
+      visible: false,
+    },
+  });
+
+  const upperToLowerRightLeg = Constraint.create({
+    bodyA: legTorso,
+    bodyB: rightLowerLeg,
+    pointA: {
+      x: 20,
+      y: -60,
+    },
+    pointB: {
+      x: 0,
+      y: 25,
+    },
+    stiffness: 1,
+    render: {
+      visible: false,
+    },
+  });
+
+  const upperToLowerPinkyLeg = Constraint.create({
+    bodyA: legTorso,
+    bodyB: pinkyLowerLeg,
+    pointA: {
+      x: 60,
+      y: -60,
+    },
+    pointB: {
+      x: 0,
+      y: 25,
+    },
+    stiffness: 1,
+    render: {
+      visible: false,
+    },
   });
 
   const playerBody = Composite.create({
-    bodies: [
-      hand,
-      finger,
-    ],
+    bodies: [legTorso, thumbLowerLeg, pointerLowerLeg, leftLowerLeg, rightLowerLeg, pinkyLowerLeg],
     constraints: [
-      fingerToHand
-    ]
+      upperToLowerThumbLeg,
+      upperToLowerPointerLeg,
+      upperToLowerLeftLeg,
+      upperToLowerRightLeg,
+      upperToLowerPinkyLeg
+    ],
   });
-
 
   const mouse = Mouse.create(render.canvas),
   mouseConstraint = MouseConstraint.create(engine, {
