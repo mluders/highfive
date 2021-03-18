@@ -1,7 +1,7 @@
-const socket = io();
+// const socket = io();
 let startEmitting = false;
 let localGameState = {};
-let lastPosition = { x: 0, y: 0 };
+let lastPosition = { x: 75, y: 75 };
 
 const handleMouseMove = (event) => {
   let eventDoc, doc, body;
@@ -26,14 +26,14 @@ const handleMouseMove = (event) => {
 
 document.onmousemove = handleMouseMove;
 
-setInterval(() => {
-  if (!startEmitting) return;
+// setInterval(() => {
+//   if (!startEmitting) return;
 
-  socket.emit('playerMovement', lastPosition);
-}, 1000 / 20);
+//   socket.emit('playerMovement', lastPosition);
+// }, 1000 / 20);
 
-setTimeout(() => startEmitting = true, 2000);
+// setTimeout(() => startEmitting = true, 2000);
 
-socket.on('state', (gameState) => {
-  localGameState = gameState;
-});
+// socket.on('state', (gameState) => {
+//   localGameState = gameState;
+// });

@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
     player.y = playerMovement.y;
   });
 
-  gameState.players[socket.id] = { x: 0, y: 0 };
+  gameState.players[socket.id] = { x: 75, y: 75 };
 });
 
 setInterval(() => {
