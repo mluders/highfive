@@ -1,3 +1,15 @@
+const INSPIRATIONAL_MESSAGES = [
+  'Go Team!',
+  'Wow',
+  "You're amazing!",
+  "Right on!",
+  "Coolio",
+  "Rockin'",
+];
+
+let currentlyInspiring = false;
+let currentlyConfettiing = false;
+
 const playerBodies = {};
 
 const {
@@ -233,13 +245,14 @@ setInterval(() => {
     if (!otherBodies.length) return;
 
     if (Matter.Query.collides(myBody, otherBodies).length > 0) {
-      console.log('High Five!')
+      inspire(myBody.position.x, myBody.position.y);
+      launchConfetti(myBody.position.x, myBody.position.y);
     }
 
   } catch (err) {
     console.log(err)
   }
-}, 500);
+}, 50);
 
 // Handle connects and disconnects
 setInterval(() => {
@@ -258,3 +271,52 @@ setInterval(() => {
   }
 
 }, 500);
+
+function inspire(x, y) {
+  if (currentlyInspiring) return;
+  currentlyInspiring = true;
+  
+  const message = INSPIRATIONAL_MESSAGES[Math.floor(Math.random() * INSPIRATIONAL_MESSAGES.length)];
+
+  const canvas = document.getElementById('inspiration');
+  canvas.style.display = 'block';
+
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.textAlign = "center"; 
+  ctx.font = "50px Helvetica";
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(message, x + 25, y - 10); 
+
+  setTimeout(() => {
+    canvas.style.display = 'none';
+    currentlyInspiring = false;
+  }, 500);
+}
+
+function randomInRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+
+function launchConfetti(x, y) {
+  if (currentlyConfettiing) return;
+  currentlyConfettiing = true;
+
+  setTimeout(() => currentlyConfettiing = false, 300);
+
+  const canvas = document.getElementById('confetti');
+  const originX = x / canvas.width;
+  const originY = y / canvas.height;
+
+  const myConfetti = confetti.create(canvas, {
+    resize: true,
+    useWorker: true
+  });
+
+  myConfetti({
+    particleCount: 100,
+    spread: 160,
+    origin: { x: originX, y: originY }
+  });
+}
