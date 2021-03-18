@@ -83,6 +83,7 @@ mouseConstraint = MouseConstraint.create(engine, {
     }
   }
 });
+mouseConstraint.isRemote = false;
 
 World.add(world, mouseConstraint);
 
@@ -106,10 +107,20 @@ Render.lookAt(render, {
 // }
 
 MouseConstraint.update = function(mouseConstraint, bodies) {
-  var constraint = mouseConstraint.constraint
-  var body = hand;
+  if (mouseConstraint.isRemote) {
+    var constraint = mouseConstraint.constraint
+    var body = hand;
 
-  constraint.pointA = { x: pseudoMouseX, y: pseudoMouseY };
-  constraint.bodyB = mouseConstraint.body = body;
-  constraint.angleB = body.angle;
+    constraint.pointA = { x: pseudoMouseX, y: pseudoMouseY };
+    constraint.bodyB = mouseConstraint.body = body;
+    constraint.angleB = body.angle;
+  } else {
+    var mouse = mouseConstraint.mouse;
+    var constraint = mouseConstraint.constraint
+    var body = hand;
+
+    constraint.pointA =  mouse.position;
+    constraint.bodyB = mouseConstraint.body = body;
+    constraint.angleB = body.angle;
+  }
 }
