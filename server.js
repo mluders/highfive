@@ -1,4 +1,3 @@
-const FPS = 30;
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -16,7 +15,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('playerMovement', (playerMovement) => {
-    console.log(playerMovement);
     const player = gameState.players[socket.id]
     player.x = playerMovement.x;
     player.y = playerMovement.y;
@@ -26,9 +24,8 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
-  // io.sockets.emit('state', gameState);
-  //console.log(gameState);
-}, 1000 / FPS);
+  io.sockets.emit('state', gameState);
+}, 1000 / 20);
 
 http.listen(8080, () => {
   console.log('listening on localhost:8080');
