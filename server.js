@@ -1,7 +1,7 @@
-const express = require('express');
-const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+var express = require('express'),
+    app = express(),
+    server = require('http').createServer(app),
+    io = require('socket.io')(server);
 
 const gameState = {
   players: {}
@@ -27,6 +27,6 @@ setInterval(() => {
   io.sockets.emit('state', gameState);
 }, 1000 / 20);
 
-http.listen(8080, () => {
+server.listen(process.env.PORT || 8080, () => {
   console.log('listening on localhost:8080');
 });
