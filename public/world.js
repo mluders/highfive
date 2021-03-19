@@ -7,6 +7,11 @@ const INSPIRATIONAL_MESSAGES = [
   "Rockin'",
 ];
 
+const HAPPY_HOUR_MESSAGES = [
+  "It's quittin' time",
+  "All in a day's work"
+]
+
 const handColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
 
 let currentlyInspiring = false;
@@ -371,7 +376,7 @@ setInterval(() => {
 
     if (Matter.Query.collides(myBody, otherBodies).length > 0) {
       inspire(myBody.position.x, myBody.position.y);
-      launchConfetti(myBody.position.x, myBody.position.y);
+      if (!happyHour) launchConfetti(myBody.position.x, myBody.position.y);
     }
 
   } catch (err) {}
@@ -399,7 +404,9 @@ function inspire(x, y) {
   if (currentlyInspiring) return;
   currentlyInspiring = true;
   
-  const message = INSPIRATIONAL_MESSAGES[Math.floor(Math.random() * INSPIRATIONAL_MESSAGES.length)];
+  const message = happyHour ?
+    HAPPY_HOUR_MESSAGES[Math.floor(Math.random() * HAPPY_HOUR_MESSAGES.length)] :
+    INSPIRATIONAL_MESSAGES[Math.floor(Math.random() * INSPIRATIONAL_MESSAGES.length)];
 
   const canvas = document.getElementById('inspiration');
   canvas.style.display = 'block';
@@ -409,24 +416,23 @@ function inspire(x, y) {
   ctx.textAlign = "center"; 
   ctx.font = "50px Helvetica";
   ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(message, x + 25, y - 10); 
+  ctx.fillText(message, x + 25, y - 120);
 
   setTimeout(() => {
     canvas.style.display = 'none';
     currentlyInspiring = false;
-  }, 500);
+  }, 750);
 }
 
 function randomInRange(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-
 function launchConfetti(x, y) {
   if (currentlyConfettiing) return;
   currentlyConfettiing = true;
 
-  setTimeout(() => currentlyConfettiing = false, 300);
+  setTimeout(() => currentlyConfettiing = false, 750);
 
   const canvas = document.getElementById('confetti');
   const originX = x / canvas.width;
