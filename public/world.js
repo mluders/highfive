@@ -7,6 +7,8 @@ const INSPIRATIONAL_MESSAGES = [
   "Rockin'",
 ];
 
+const handColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+
 let currentlyInspiring = false;
 let currentlyConfettiing = false;
 
@@ -85,7 +87,7 @@ function newPlayer(socketID) {
     },
     label: "chest",
     render: {
-      fillStyle: "#E0A423",
+      fillStyle: handColor,
     },
   };
   const fingerOptions = {
@@ -98,7 +100,7 @@ function newPlayer(socketID) {
       radius: 0,
     },
     render: {
-      fillStyle: '#E0A423',
+      fillStyle: handColor,
     },
   };
 
@@ -112,7 +114,7 @@ function newPlayer(socketID) {
       radius: 0,
     },
     render: {
-      fillStyle: "#E0A423",
+      fillStyle: handColor,
     },
   };
 
