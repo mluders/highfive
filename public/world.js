@@ -14,6 +14,7 @@ let currentlyConfettiing = false;
 let currentlyFilling = false;
 
 const playerBodies = {};
+const beerParticles = [];
 
 const {
   Bodies,
@@ -131,6 +132,12 @@ function openTheTap() {
   };
 
   const beerParticle = Bodies.circle(lastPosition.x, lastPosition.y - 100, 5, beerOptions);
+  beerParticle.offScreen = function() {
+    var pos = this.position;
+    return pos.y > 1000;
+  };
+
+  beerParticles.push(beerParticle);
   World.add(world, beerParticle);
 }
 
@@ -146,9 +153,22 @@ document.addEventListener('keyup', (e) => {
   }
 });
 
+
+// Create beer particles when spacebar is pressed
 setInterval(() => {
   if (currentlyFilling) openTheTap();
-}, 8);
+}, 15);
+
+// Delete beer particles when off screen
+setInterval(() => {
+  for (let i = 0; i < beerParticles.length; i++) {
+    if (beerParticles[i].offScreen()) {
+      World.remove(world, beerParticles[i]);
+      beerParticles.splice(i, 1);
+      console.log('Removing beer particle');
+    }
+  }
+}, 2000);
 
 function generateHand() {
   const x = 100;
