@@ -11,6 +11,7 @@ const handColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
 
 let currentlyInspiring = false;
 let currentlyConfettiing = false;
+let currentlyFilling = false;
 
 const playerBodies = {};
 
@@ -48,6 +49,8 @@ MouseConstraint.update = function(mouseConstraint, bodies) {
         constraint.pointA = { x: 200, y: 200 };
       } else {
         constraint.pointA = mouse.position;
+        constraint.pointA.x = constraint.pointA.x - 13;
+        constraint.pointA.y = constraint.pointA.y;
       }
 
       constraint.bodyB = mouseConstraint.body = playerBody;
@@ -70,6 +73,83 @@ var render = Render.create({
   }
 });
 
+function generateCup() {
+  const x = 0;
+  const y = 0;
+
+  const defaultCollisionGroup = -1;
+
+  const cupOptions = {
+    friction: 1,
+    frictionAir: 0.05,
+    density: 0.1,
+    collisionFilter: {
+      group: defaultCollisionGroup,
+    },
+    label: 'cup',
+    render: {
+      fillStyle: '#AAAAAA',
+    },
+  };
+
+  const cupBottomOptions = {
+    ...cupOptions,
+    density: 1
+  };
+
+  const cupLeft = Bodies.rectangle(x - 40, y, 10, 135, cupOptions);
+  const cupRight = Bodies.rectangle(x + 40, y, 10, 135, cupOptions);
+  const cupBottom = Bodies.rectangle(x, y + 55, 75, 25, cupBottomOptions);
+
+  const handleLeft = Bodies.rectangle(x - 65, y, 10, 70, cupOptions);
+  const handleTop = Bodies.rectangle(x - 55, y - 30, 25, 10, cupOptions);
+  const handleBottom = Bodies.rectangle(x - 55, y + 30, 25, 10, cupOptions);
+
+  const cup = Body.create({
+    parts: [cupLeft, cupRight, cupBottom, handleLeft, handleTop, handleBottom],
+    collisionFilter: {
+      group: defaultCollisionGroup - 1,
+    },
+  });
+
+  const playerBody = Composite.create({
+    bodies: [cup]
+  });
+
+  return playerBody;
+}
+
+function openTheTap() {
+  const beerOptions = {
+    friction: 1,
+    frictionAir: 0.05,
+    density: 0.001,
+    label: 'beerParticle',
+    render: {
+      fillStyle: '#FFCD02',
+    },
+  };
+
+  const beerParticle = Bodies.circle(lastPosition.x, lastPosition.y - 100, 5, beerOptions);
+  World.add(world, beerParticle);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space'){
+    currentlyFilling = true;
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.code === 'Space'){
+    currentlyFilling = false;
+  }
+});
+
+setInterval(() => {
+  if (currentlyFilling) openTheTap();
+}, 8);
+
 function generateHand() {
   const x = 100;
   const y = 100;
@@ -85,7 +165,7 @@ function generateHand() {
     chamfer: {
       radius: 20,
     },
-    label: "palm",
+    label: 'palm',
     render: {
       fillStyle: handColor,
     },
@@ -119,7 +199,7 @@ function generateHand() {
     },
   };
 
-  palm = Bodies.rectangle(x, y, 90, 80, palmOptions);
+  const palm = Bodies.rectangle(x, y, 90, 80, palmOptions);
   palm.size = 40; // To determine overlap of goal
 
   const thumbUpperFinger = Bodies.rectangle(x - 60, y, 20, 50, Object.assign({}, fingerOptions));
@@ -204,9 +284,10 @@ function generateHand() {
   return playerBody;
 }
 
-function newPlayer(socketID, happyHour = false) {
+function newPlayer(socketID, happyHour = true) {
   let playerBody = null;
   if (happyHour) {
+    playerBody = generateCup();
   } else {
     playerBody = generateHand();
   }
@@ -262,9 +343,7 @@ setInterval(() => {
       launchConfetti(myBody.position.x, myBody.position.y);
     }
 
-  } catch (err) {
-    console.log(err)
-  }
+  } catch (err) {}
 }, 50);
 
 // Handle connects and disconnects
