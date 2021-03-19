@@ -70,12 +70,12 @@ var render = Render.create({
   }
 });
 
-function newPlayer(socketID) {
+function generateHand() {
   const x = 100;
   const y = 100;
   const defaultCollisionGroup = -1;
 
-  const chestOptions = {
+  const palmOptions = {
     friction: 1,
     frictionAir: 0.05,
     density: 1,
@@ -85,11 +85,12 @@ function newPlayer(socketID) {
     chamfer: {
       radius: 20,
     },
-    label: "chest",
+    label: "palm",
     render: {
       fillStyle: handColor,
     },
   };
+
   const fingerOptions = {
     friction: 1,
     frictionAir: 0.03,
@@ -118,8 +119,8 @@ function newPlayer(socketID) {
     },
   };
 
-  chest = Bodies.rectangle(x, y, 90, 80, chestOptions);
-  chest.size = 40; // To determine overlap of goal
+  palm = Bodies.rectangle(x, y, 90, 80, palmOptions);
+  palm.size = 40; // To determine overlap of goal
 
   const thumbUpperFinger = Bodies.rectangle(x - 60, y, 20, 50, Object.assign({}, fingerOptions));
   Matter.Body.rotate(thumbUpperFinger, -10)
@@ -134,7 +135,7 @@ function newPlayer(socketID) {
   const rightLowerFinger = Bodies.rectangle(x + 30, y - 100, 20, 60, Object.assign({}, lowerFingerOptions));
 
   const fingerPalm = Body.create({
-    parts: [chest, thumbUpperFinger, pointerUpperFinger, leftUpperFinger, rightUpperFinger],
+    parts: [palm, thumbUpperFinger, pointerUpperFinger, leftUpperFinger, rightUpperFinger],
     collisionFilter: {
       group: defaultCollisionGroup - 1,
     },
@@ -199,6 +200,16 @@ function newPlayer(socketID) {
       upperToLowerRightFinger
     ],
   });
+
+  return playerBody;
+}
+
+function newPlayer(socketID, happyHour = false) {
+  let playerBody = null;
+  if (happyHour) {
+  } else {
+    playerBody = generateHand();
+  }
 
   const mouse = Mouse.create(render.canvas),
   mouseConstraint = MouseConstraint.create(engine, {
