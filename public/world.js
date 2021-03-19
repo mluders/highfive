@@ -8,11 +8,17 @@ const INSPIRATIONAL_MESSAGES = [
 ];
 
 const HAPPY_HOUR_MESSAGES = [
-  "It's quittin' time",
-  "All in a day's work"
-]
+  "Quittin' time",
+  "Beer me",
+  "Cheers"
+];
 
-const handColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+const HAND_COLORS = [
+  '#1ABC9C',
+  '#3498DB',
+  '#9B59B6',
+  '#C0392B'
+];
 
 let currentlyInspiring = false;
 let currentlyConfettiing = false;
@@ -187,6 +193,8 @@ setInterval(() => {
 }, 2000);
 
 function generateHand() {
+  const handColor = HAND_COLORS[Math.floor(Math.random() * HAND_COLORS.length)]
+
   const x = 100;
   const y = 100;
   const defaultCollisionGroup = -1;
