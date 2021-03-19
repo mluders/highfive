@@ -120,7 +120,7 @@ function generateCup() {
   return playerBody;
 }
 
-function openTheTap() {
+function openTheTap(x, y) {
   const beerOptions = {
     friction: 1,
     frictionAir: 0.05,
@@ -131,7 +131,7 @@ function openTheTap() {
     },
   };
 
-  const beerParticle = Bodies.circle(lastPosition.x, lastPosition.y - 100, 5, beerOptions);
+  const beerParticle = Bodies.circle(x, y - 100, 5, beerOptions);
   beerParticle.offScreen = function() {
     var pos = this.position;
     return pos.y > 1000;
@@ -143,6 +143,9 @@ function openTheTap() {
 
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space'){
+    if (currentlyFilling) return;
+
+    socket.emit('openTap');
     currentlyFilling = true;
   }
 });
@@ -150,13 +153,21 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keyup', (e) => {
   if (e.code === 'Space'){
     currentlyFilling = false;
+    socket.emit('closeTap');
   }
 });
 
-
 // Create beer particles when spacebar is pressed
 setInterval(() => {
-  if (currentlyFilling) openTheTap();
+  if (currentlyFilling) openTheTap(lastPosition.x, lastPosition.y);
+  
+  for (const [key, value] of Object.entries(localGameState.players)) {
+    if (key == socket.id) continue;
+    if (!value.filling) continue;
+
+    console.log('Opening remote tap');
+    openTheTap(value.x, value.y)
+  }
 }, 15);
 
 // Delete beer particles when off screen

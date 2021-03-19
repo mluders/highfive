@@ -20,7 +20,17 @@ io.on('connection', (socket) => {
     player.y = playerMovement.y;
   });
 
-  gameState.players[socket.id] = { x: 200, y: 200 };
+  socket.on('openTap', () => {
+    const player = gameState.players[socket.id];
+    player.filling = true;
+  });
+
+  socket.on('closeTap', () => {
+    const player = gameState.players[socket.id];
+    player.filling = false;
+  });
+
+  gameState.players[socket.id] = { x: 200, y: 200, filling: false };
 });
 
 setInterval(() => {
