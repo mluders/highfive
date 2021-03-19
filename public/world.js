@@ -315,7 +315,7 @@ function generateHand() {
   return playerBody;
 }
 
-function newPlayer(socketID, happyHour = true) {
+function newPlayer(socketID) {
   let playerBody = null;
   if (happyHour) {
     playerBody = generateCup();

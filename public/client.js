@@ -1,4 +1,5 @@
 const socket = io();
+const happyHour = new URL(window.location.href).pathname == '/beer';
 let startEmitting = false;
 let localGameState = {};
 let lastPosition = { x: 200, y: 200 };
